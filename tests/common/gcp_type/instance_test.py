@@ -70,5 +70,17 @@ class InstanceTest(ForsetiTestCase):
                            u'natIP': u'000.000.000.001'}],
                          network_interface.access_configs)
 
+    def test_network_tag_creation(self):
+        network_tags = (instance.Instance(
+            **fake_instance.FAKE_INSTANCE_RESPONSE_1)
+                              .create_network_tags())
+        self.assertEqual(len(network_tags), 3)
+
+    def test_empty_network_tag_creation(self):
+        network_tags = (instance.Instance(
+            **fake_instance.FAKE_INSTANCE_RESPONSE_3)
+                              .create_network_tags())
+        self.assertEqual(len(network_tags), 0)
+
 if __name__ == '__main__':
     unittest.main()

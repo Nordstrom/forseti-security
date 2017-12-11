@@ -72,6 +72,15 @@ class Instance(object):
         return [InstanceNetworkInterface(**ni)
                 for ni in self.network_interfaces]
 
+    def create_network_tags(self):
+        """Return a list of network_tag objects.network_tag
+
+        Returns:
+            List: list of InstanceNetworkTag objects
+        """
+        return [InstanceNetworkTag(**{'value': tag})
+                for tag in self.tags.get('items', [])]
+
 
 KEY_OBJECT_KIND = 'Instance'
 
@@ -216,6 +225,68 @@ class InstanceNetworkInterface(object):
         return False
 
     # TODO: Add this as a base method for all gcp_type objects.
+    def as_json(self):
+        """Returns the attributes as json formatted string.
+
+        Returns:
+            string: json formatted attribute of the instance network interface
+        """
+        return self._json
+
+
+class InstanceNetworkTag(object):
+    """InstanceNetworkTag Resource."""
+
+    def __init__(self, **kwargs):
+        """Initialize
+
+        Args:
+            kwargs: json from a single instance of the tags value
+        """
+        self.items = kwargs.get('items')
+        self._json = json.dumps(kwargs, sort_keys=True, indent=2)
+
+    def __repr__(self):
+        """Repr
+
+        Returns:
+            string: a string for a InstanceNetworkTag
+        """
+        return ('items: %s' % (
+                    " ".join(self.items)))
+
+    def __hash__(self):
+        """hash
+
+        Returns:
+            hash: of InstanceNetworkTag
+        """
+        return hash(self.__repr__())
+
+    def __ne__(self, other):
+        """Ne
+
+        Args:
+            other (InstanceNetworkTag): other InstanceNetworkTag
+
+        Return:
+            bool: True if not equal
+        """
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        """Eq
+
+        Args:
+            other (InstanceNetworkTag) : other InstanceNetworkTag
+
+        Return:
+            bool: True if is equal
+        """
+        if isinstance(self, InstanceNetworkTag):
+            return (self.items == other.items)
+        return False
+
     def as_json(self):
         """Returns the attributes as json formatted string.
 
