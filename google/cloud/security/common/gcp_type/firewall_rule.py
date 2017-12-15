@@ -118,7 +118,7 @@ class FirewallRule(object):
                       self.network,
                       self._priority,
                       self.direction,
-                      self._firewall_action)
+                      self.firewall_action)
 
         for field_name, value in [
                 ('sourceRanges', self._source_ranges),
@@ -178,6 +178,21 @@ class FirewallRule(object):
         if project_id:
             in_dict['project_id'] = project_id
         return FirewallRule(validate=validate, **in_dict)
+
+    @staticmethod
+    def tags_are_subset(tags_1, tags_2):
+        """Returns whether one tags list is a subset of another.
+
+        Args:
+          tags_1 (list): A list of string tags.
+          tags_2 (list): A list of string tags.
+
+        Returns:
+          bool: Whether tags_1 are a subset of tags_2 or not.
+        """
+        if '*' in tags_2:
+            return True
+        return set(tags_1).issubset(tags_2)
 
     @classmethod
     def from_json(cls, json_string, project_id=None):
@@ -497,12 +512,13 @@ class FirewallRule(object):
           bool: comparison result
         """
         LOGGER.debug('Checking %s < %s', self, other)
+
         return ((self.direction == other.direction or
                  self.direction is None or
                  other.direction is None) and
                 (self.network == other.network or other.network is None) and
-                set(self.source_tags).issubset(other.source_tags) and
-                set(self.target_tags).issubset(other.target_tags) and
+                self.tags_are_subset(self.source_tags, other.source_tags) and
+                self.tags_are_subset(self.target_tags, other.target_tags) and
                 self.firewall_action < other.firewall_action and
                 ips_in_list(self.source_ranges, other.source_ranges) and
                 ips_in_list(self.destination_ranges, other.destination_ranges))
@@ -525,8 +541,8 @@ class FirewallRule(object):
                  self.direction == other.direction) and
                 (self.network is None or other.network is None or
                  self.network == other.network) and
-                set(other.source_tags).issubset(self.source_tags) and
-                set(other.target_tags).issubset(self.target_tags) and
+                self.tags_are_subset(other.source_tags, self.source_tags) and
+                self.tags_are_subset(other.target_tags, self.target_tags) and
                 self.firewall_action > other.firewall_action and
                 ips_in_list(other.source_ranges, self.source_ranges) and
                 ips_in_list(other.destination_ranges, self.destination_ranges))
