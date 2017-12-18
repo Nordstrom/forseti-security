@@ -65,7 +65,6 @@ class InstanceNetworkInterfaceRulesEngine(bre.BaseRulesEngine):
         if self.rule_book is None or force_rebuild:
             self.build_rule_book()
         resource_rules = self.rule_book.get_resource_rules()
-
         for rule in resource_rules:
             violations = itertools.chain(violations,
                                          rule.find_violations(
@@ -80,6 +79,7 @@ class InstanceNetworkInterfaceRulesEngine(bre.BaseRulesEngine):
         """
         if self.rule_book is not None:
             self.rule_book.add_rules(rules)
+
 
 class InstanceNetworkInterfaceRuleBook(bre.BaseRuleBook):
     """The RuleBook for enforced networks resources."""
