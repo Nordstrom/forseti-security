@@ -54,5 +54,9 @@ SUPPORTED_APIS = {
     'storage': {
         'default_version': 'v1',
         'supported_versions': ['v1']
+    },
+    'pubsub': {
+        'default_version': 'v1',
+        'supported_versions': ['v1']
     }
 }

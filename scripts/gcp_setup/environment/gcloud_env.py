@@ -28,6 +28,7 @@ import sys
 import time
 
 
+DEFAULT_TOPIC_FMT = 'projects/{}/topics/{}'
 DEFAULT_BUCKET_FMT = 'gs://{}-data-{}'
 DEFAULT_CLOUDSQL_INSTANCE_NAME = 'forseti-security'
 
@@ -54,6 +55,7 @@ PROJECT_IAM_ROLES = [
     'roles/storage.objectCreator',
     'roles/cloudsql.client',
     'roles/logging.logWriter',
+    'roles/pubsub.editor'
 ]
 
 REQUIRED_APIS = [
@@ -145,6 +147,7 @@ class ForsetiGcpSetup(object):
         self.notification_sender_email = None
         self.notification_recipient_email = (
             kwargs.get('notification_recipient_email'))
+        self.topic_name = kwargs.get('topic_name')
         self.gsuite_superadmin_email = kwargs.get('gsuite_superadmin_email')
         self.network_host_project_id = kwargs.get('network_host_project_id',
                                                   self.project_id)
@@ -610,6 +613,7 @@ class ForsetiGcpSetup(object):
             Cloud SQL Client
             Storage Object Viewer
             Storage Object Creator
+            PubSub Editor
         """
         self._print_banner('Assigning roles to the GCP service account')
         if not self.organization_id:
@@ -652,6 +656,11 @@ class ForsetiGcpSetup(object):
         self.bucket_name = DEFAULT_BUCKET_FMT.format(
             self.project_id, self.timeonly)
 
+   def generate_topic_name(self):
+        """Generate Pub/Sub topic name for alerts."""
+        self.topic_name = DEFAULT_TOPIC_FMT.format(
+            self.project_id, self.topic)
+
     def generate_deployment_templates(self):
         """Generate deployment templates."""
         print('Generate Deployment Manager templates...')
@@ -672,6 +681,7 @@ class ForsetiGcpSetup(object):
             'CLOUDSQL_REGION': self.cloudsql_region,
             'CLOUDSQL_INSTANCE_NAME': self.cloudsql_instance,
             'SCANNER_BUCKET': self.bucket_name[len('gs://'):],
+            'TOPIC': self.topic_name,
             'BUCKET_LOCATION': self.bucket_location,
             'SERVICE_ACCT_GCP_READER': self.gcp_service_account,
             'SERVICE_ACCT_GSUITE_READER': self.gsuite_service_account,
@@ -710,6 +720,7 @@ class ForsetiGcpSetup(object):
             'EMAIL_RECIPIENT': self.notification_recipient_email,
             'EMAIL_SENDER': self.notification_sender_email,
             'SENDGRID_API_KEY': self.sendgrid_api_key,
+            'TOPIC': self.topic_name,
             'SCANNER_BUCKET': self.bucket_name[len('gs://'):],
             'GROUPS_SERVICE_ACCOUNT_KEY_FILE':
                 '/home/ubuntu/{}'.format(GSUITE_KEY_NAME),
@@ -757,6 +768,20 @@ class ForsetiGcpSetup(object):
             self.gsuite_superadmin_email = raw_input(
                 'What is your organization\'s G Suite super admin email? '
                 '(press [enter] to skip) ').strip()
+
+         if not self.topic_name:
+            # Ask for Setting up Pub/Sub
+            print('Forseti can send notifications through Pub/Sub '
+                  'This step is optional and can be configured later.')
+
+            self.topic_name = raw_input(
+                'What is the Topic Name'
+                '(press [enter] to skip) ').strip()
+
+        if self.topic_name:
+            self.notification_sender_email = 'forseti-notify@localhost.domain'
+         else:
+            self.skip_topic = True
 
     def create_deployment(self):
         """Create the GCP deployment.
@@ -896,6 +921,13 @@ class ForsetiGcpSetup(object):
               '    http://forsetisecurity.org/docs/howto/deploy/'
               'gcp-deployment.html#move-configuration-to-gcs\n\n'.format(
                   self.bucket_name))
+
+        if self.skip_topic:
+            print('If you would like to enable Pub/Sub notifications via '
+                  'Pub/Sub, please refer to:\n\n'
+                  '    '
+                  'http://forsetisecurity.org/docs/howto/configure/'
+                  'pubsub-notificationn\n\n')
 
         if self.skip_email:
             print('If you would like to enable email notifications via '

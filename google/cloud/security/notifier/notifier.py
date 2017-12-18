@@ -32,6 +32,7 @@ from google.apputils import app
 from google.cloud.security.common.data_access import dao
 from google.cloud.security.common.data_access import errors as db_errors
 from google.cloud.security.common.data_access import violation_dao
+from google.cloud.security.common.gcp_api import pubsub
 from google.cloud.security.common.util import file_loader
 from google.cloud.security.common.util import log_util
 from google.cloud.security.notifier.pipelines.base_notification_pipeline import BaseNotificationPipeline
@@ -207,16 +208,19 @@ def main(_):
             continue
         if not resource['should_notify']:
             continue
-        for pipeline in resource['pipelines']:
-            LOGGER.info('Running \'%s\' pipeline for resource \'%s\'',
-                        pipeline['name'], resource['resource'])
-            chosen_pipeline = find_pipelines(pipeline['name'])
-            pipelines.append(chosen_pipeline(resource['resource'],
-                                             timestamp,
-                                             violations[resource['resource']],
-                                             global_configs,
-                                             notifier_configs,
-                                             pipeline['configuration']))
+        if resource['pipelines']:
+            for pipeline in resource['pipelines']:
+                LOGGER.info('Running \'%s\' pipeline for resource \'%s\'',
+                            pipeline['name'], resource['resource'])
+                chosen_pipeline = find_pipelines(pipeline['name'])
+                pipelines.append(chosen_pipeline(resource['resource'],
+                                                timestamp,
+                                                violations[resource['resource']],
+                                                global_configs,
+                                                notifier_configs,
+                                                pipeline['configuration']))
+        else:
+            LOGGER.debug('No pipelines for: %s', resource['resource'])
 
     # run the pipelines
     for pipeline in pipelines:

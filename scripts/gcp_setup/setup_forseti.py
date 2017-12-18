@@ -57,6 +57,10 @@ def run():
     email_params.add_argument('--gsuite-superadmin-email',
                               help='G Suite super admin email')
 
+    pubsub_params = parser.add_argument_group(title='pubsub')
+    pubsub_params.add_argument('--topic-name',
+                              help='PubSub Topic Name')
+
     args = vars(parser.parse_args())
     forseti_setup = gcloud_env.ForsetiGcpSetup(**args)
     forseti_setup.run_setup()
