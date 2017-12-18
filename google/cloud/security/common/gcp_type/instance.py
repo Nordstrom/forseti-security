@@ -78,9 +78,12 @@ class Instance(object):
         Returns:
             List: list of InstanceNetworkTag objects
         """
-        return [InstanceNetworkTag(**{'value': tag})
-                for tag in self.tags.get('items', [])]
-
+        obj_init = dict()
+        obj_init.update({'project_id': self.project_id})
+        obj_init.update({'tags': self.tags.get('items', [])})
+        return [InstanceNetworkTag(**obj_init) for each in [
+                obj_init.update(ni) for ni in self.network_interfaces]
+                ]
 
 KEY_OBJECT_KIND = 'Instance'
 
@@ -243,7 +246,9 @@ class InstanceNetworkTag(object):
         Args:
             kwargs: json from a single instance of the tags value
         """
-        self.items = kwargs.get('items')
+        self.tags = kwargs.get('tags')
+        self.network = kwargs.get('network')
+        self.project_id = kwargs.get('project_id')
         self._json = json.dumps(kwargs, sort_keys=True, indent=2)
 
     def __repr__(self):
@@ -252,8 +257,8 @@ class InstanceNetworkTag(object):
         Returns:
             string: a string for a InstanceNetworkTag
         """
-        return ('items: %s' % (
-                    " ".join(self.items)))
+        return ('network: %s project_id: %s tags: %s' % (
+            self.network, self.project_id, " ".join(self.tags)))
 
     def __hash__(self):
         """hash
@@ -284,7 +289,7 @@ class InstanceNetworkTag(object):
             bool: True if is equal
         """
         if isinstance(self, InstanceNetworkTag):
-            return (self.items == other.items)
+            return (self.tags == other.tags)
         return False
 
     def as_json(self):
