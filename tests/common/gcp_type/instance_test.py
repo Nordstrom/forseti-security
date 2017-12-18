@@ -74,13 +74,13 @@ class InstanceTest(ForsetiTestCase):
         network_tags = (instance.Instance(
             **fake_instance.FAKE_INSTANCE_RESPONSE_1)
                               .create_network_tags())
-        self.assertEqual(len(network_tags), 3)
+        self.assertEqual(len(network_tags), 1)
 
-    def test_empty_network_tag_creation(self):
+    def test_zero_network_tag_creation(self):
         network_tags = (instance.Instance(
             **fake_instance.FAKE_INSTANCE_RESPONSE_3)
                               .create_network_tags())
-        self.assertEqual(len(network_tags), 0)
+        self.assertEqual(len(network_tags[0].tags), 0)
 
 if __name__ == '__main__':
     unittest.main()
