@@ -82,9 +82,8 @@ class Instance(object):
         obj_init.update({'project_id': self.project_id})
         obj_init.update({'tags': self.tags.get('items', [])})
         obj_init.update({'instance_name': self.name})
-        return [InstanceNetworkTag(**obj_init) for each in [
-                obj_init.update(ni) for ni in self.network_interfaces]
-                ]
+        return [InstanceNetworkTag(**dict(
+            obj_init, **ni)) for ni in self.network_interfaces]
 
 KEY_OBJECT_KIND = 'Instance'
 
@@ -185,8 +184,8 @@ class InstanceNetworkInterface(object):
         Returns:
             string: a string for a InstanceNetworkInterface
         """
-        return ('kind: %s Network: %s subnetwork: %s network_ip %s name %s'
-                'access_configs %s alias_ip_ranges %s' % (
+        return ('kind: %s network: %s subnetwork: %s network_ip: %s'
+                ' name: %s access_configs: %s alias_ip_ranges: %s' % (
                     self.kind, self.network, self.subnetwork, self.network_ip,
                     self.name, self.access_configs, self.alias_ip_ranges))
 
@@ -260,9 +259,10 @@ class InstanceNetworkTag(object):
         Returns:
             string: a string for a InstanceNetworkTag
         """
-        return ('instance_name: %s name: %s network: %s project_id: %s tags: %s' % (
-            self.instance_name, self.name, self.network,
-            self.project_id, " ".join(self.tags)))
+        return ('instance_name: %s name: %s network: %s project_id: %s'
+                'tags: %s' % (
+                    self.instance_name, self.name, self.network,
+                    self.project_id, " ".join(self.tags)))
 
     def __hash__(self):
         """hash
