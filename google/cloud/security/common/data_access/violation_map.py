@@ -39,4 +39,6 @@ VIOLATION_RESOURCES = {
     'IAP_VIOLATION': 'iap_violations',
     'INSTANCE_NETWORK_INTERFACE_VIOLATION': (
         'instance_network_interface_violations'),
+    'INSTANCE_NETWORK_TAG_VIOLATION': (
+        'instance_network_tag_violation')
 }

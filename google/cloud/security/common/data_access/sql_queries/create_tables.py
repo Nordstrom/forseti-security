@@ -542,7 +542,8 @@ CREATE_VIOLATIONS_TABLE = """
                               'FORWARDING_RULE_VIOLATION',
                               'GROUP_VIOLATION',
                               'IAP_VIOLATION',
-                              'INSTANCE_NETWORK_INTERFACE_VIOLATION') NOT NULL,
+                              'INSTANCE_NETWORK_INTERFACE_VIOLATION',
+                              'INSTANCE_NETWORK_TAG_VIOLATION') NOT NULL,
         `violation_data` json DEFAULT NULL,
         PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
