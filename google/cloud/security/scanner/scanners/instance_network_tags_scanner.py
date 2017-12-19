@@ -62,16 +62,20 @@ class InstanceNetworkTagsScanner(base_scanner.BaseScanner):
             dict: Iterator of RuleViolations as a dict per member.
         """
         for violation in violations:
+            print violation
             violation_data = {}
             violation_data['project'] = violation.project
             violation_data['network'] = violation.network
-            violation_data['ip'] = violation.ip
+            violation_data['tags'] = violation.tags
+            # violation_data['name'] = violation.name
+            violation_data['instance_name'] = violation.instance_name
             violation_data['raw_data'] = violation.raw_data
             yield {
-                'resource_id': 'instance_network_tag',
+                'resource_id': violation.instance_name,
                 'resource_type': violation.resource_type,
                 'rule_index': violation.rule_index,
                 'rule_name': violation.rule_name,
+                # 'name': violation.name,
                 'violation_type': violation.violation_type,
                 'violation_data': violation_data
             }
@@ -153,23 +157,21 @@ class InstanceNetworkTagsScanner(base_scanner.BaseScanner):
         """
         return self.get_instance_networks_tags()
 
-    def _find_violations(self, enforced_networks_data):
+    def _find_violations(self, enforced_tags_data):
         """Find violations in the policies.
 
             Args:
-                enforced_networks_data (list): Enforced networks data
+                enforced_tags_data (list): Enforced network tag data
                     to find violations in
 
             Returns:
                 list: A list of violations
         """
         all_violations = []
-        LOGGER.info('Finding enforced networks violations...')
-        for instance_network_tag in enforced_networks_data:
-            LOGGER.debug('%s', instance_network_tag)
+        LOGGER.info('Finding network tag violations...')
+        for instance_network_tag in enforced_tags_data:
             violations = self.rules_engine.find_policy_violations(
                 instance_network_tag)
-            LOGGER.debug(violations)
             all_violations.extend(violations)
         return all_violations
 

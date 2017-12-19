@@ -54,4 +54,8 @@ REQUIREMENTS_MAP = {
         {'module_name': 'instance_network_interface_scanner',
          'class_name': 'InstanceNetworkInterfaceScanner',
          'rules_filename': 'instance_network_interface_rules.yaml'},
+    'instance_network_tag':
+        {'module_name': 'instance_network_tags_scanner',
+         'class_name': 'InstanceNetworkTagsScanner',
+         'rules_filename': 'instance_network_tag_rules.yaml'}
 }
