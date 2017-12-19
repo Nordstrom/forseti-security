@@ -16,14 +16,9 @@ rules:
   # This rule helps with:
   # #1 Ensure instances using an XPN are not using certain blacklisted tags using allowed tags
   - name: reserved network tags
-    project_id: '*'  #project_id
-    network: 'nonprod-xpn-01'
+    project_id: '*'
+    network: '*'
     blacklist:
-      tags:
-        - 'reserved-tag'
-  - name: allowed network tags IEPC
-    project_id: '*-IEPC'  #project_id
-    network: 'nonprod-xpn-01'
+      - 'unallowed-tag'
     whitelist:
-      tags:
-        - 'iepc-vm'
+      - 'internal-ssh'
