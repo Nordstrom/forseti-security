@@ -70,7 +70,6 @@ class ScannerBuilder(object):
                     LOGGER.error('Unable to instantiate %s\n%s',
                                  class_name, sys.exc_info()[0])
                     continue
-
                 # Simple way to find the path to folders directory no matter
                 # where forseti runs.
                 rules_path = self.scanner_configs.get('rules_path')
@@ -78,14 +77,12 @@ class ScannerBuilder(object):
                     scanner_path = inspect.getfile(scanner_class)
                     rules_path = scanner_path.split('/google/cloud/security')[0]
                     rules_path += '/rules'
-
                 rules_filename = (scanner_requirements_map.REQUIREMENTS_MAP
                                   .get(scanner.get('name'))
                                   .get('rules_filename'))
                 rules = '{}/{}'.format(rules_path, rules_filename)
                 LOGGER.info('Initializing the rules engine:\nUsing rules: %s',
                             rules)
-
                 scanner = scanner_class(self.global_configs,
                                         self.scanner_configs,
                                         self.snapshot_timestamp,
