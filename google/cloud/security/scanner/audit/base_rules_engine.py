@@ -69,6 +69,7 @@ class BaseRulesEngine(object):
         LOGGER.debug('Got rules: %r', rules)
         return rules
 
+
 class BaseRuleBook(object):
     """Base class for RuleBooks.
 
