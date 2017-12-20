@@ -121,12 +121,11 @@ class InstanceNetworkTagRuleBook(bre.BaseRuleBook):
 
         # rules yaml:
             rules:
-            - name: reserved network tags 
+            - name: reserved network tags
               project: '*'
               network: 'network-1'
               blacklist:
-                tags:
-                  - 'reserved-tag'
+              - 'reserved-tag'
 
         ... gets parsed into:
         {
@@ -135,11 +134,9 @@ class InstanceNetworkTagRuleBook(bre.BaseRuleBook):
                     "name": "reserved network tags",
                     "project": "*",
                     "network": "network-1",
-                    "blacklist": {
-                        "tags": [
-                            "reserved-tag"
-                        ]
-                    }
+                    "blacklist": [
+                        "reserved-tag"
+                    ]
                 }
             ]
         }
@@ -154,7 +151,8 @@ class InstanceNetworkTagRuleBook(bre.BaseRuleBook):
         whitelist = rule_def.get('whitelist', [])
         blacklist = rule_def.get('blacklist', [])
 
-        if ((len(whitelist) == 0 and len(blacklist) == 0) or (project_id is None) or (network is None)):
+        if (not whitelist and not blacklist) or (
+                project_id is None) or (network is None):
             raise audit_errors.InvalidRulesSchemaError(
                 'Faulty rule {}'.format(rule_def.get('name')))
 
@@ -214,17 +212,12 @@ class Rule(object):
             network = network_and_project.group(2)
             project_id = instance_network_tag.project_id
             tags = instance_network_tag.tags or []
-            if (
-                re.match(self.rules['network'], network) and
-                re.match(self.rules['project_id'], project_id)
-            ):
-                if any(
-                    t in self.rules.get('blacklist', []) for t in tags
-                    ) or (
-                    any(
-                        t not in self.rules.get(
+            if (re.match(self.rules['network'], network) and
+                    re.match(self.rules['project_id'], project_id)):
+                if any(t in self.rules.get('blacklist', []) for t in tags) or (
+                        any(t not in self.rules.get(
                             'whitelist', []) for t in tags if self.rules.get(
-                            'whitelist', []))
+                                'whitelist', []))
                 ):
                     yield self.RuleViolation(
                         resource_type='instance',
@@ -248,4 +241,5 @@ class Rule(object):
     RuleViolation = namedtuple('RuleViolation',
                                ['resource_type', 'rule_name',
                                 'rule_index', 'violation_type', 'project',
-                                'network', 'tags', 'instance_name', 'raw_data'])
+                                'network', 'tags', 'instance_name',
+                                'raw_data'])

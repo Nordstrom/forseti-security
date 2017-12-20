@@ -45,10 +45,10 @@ class InstanceNetworkTagsScanner(base_scanner.BaseScanner):
             snapshot_timestamp,
             rules)
         self.rules_engine = (
-            instance_network_tag_rules_engine
-            .InstanceNetworkTagRulesEngine(
+            instance_network_tag_rules_engine.InstanceNetworkTagRulesEngine(
                 rules_file_path=self.rules,
-                snapshot_timestamp=self.snapshot_timestamp))
+                snapshot_timestamp=self.snapshot_timestamp)
+            )
         self.rules_engine.build_rule_book(self.global_configs)
 
     @staticmethod
@@ -89,7 +89,6 @@ class InstanceNetworkTagsScanner(base_scanner.BaseScanner):
         all_violations = self._flatten_violations(all_violations)
         self._output_results_to_db(all_violations)
 
-    # pylint: disable=invalid-name
     def get_instance_networks_tags(self):
         """Get network info from a particular snapshot.
 
@@ -99,8 +98,8 @@ class InstanceNetworkTagsScanner(base_scanner.BaseScanner):
            Raises:
                MySQLError if a MySQL error occurs.
         """
-        instances = instance_dao.InstanceDao(self.global_configs).get_instances(
-            self.snapshot_timestamp)
+        instances = instance_dao.InstanceDao(
+            self.global_configs).get_instances(self.snapshot_timestamp)
         return [instance.create_network_tags() for instance in instances]
 
     @staticmethod
