@@ -32,9 +32,9 @@ before_install:
   # Build the Forseti image containing the dependencies and code.
   - docker build -t gcr.io/nordforseti/forseti -f scripts/docker/forseti --no-cache .
   # Required for codecov.io to export coverage within a Docker container.
-  - "CI_ENV=`bash <(curl -s https://codecov.io/env)`"
+  #- "CI_ENV=`bash <(curl -s https://codecov.io/env)`"
   # Start the container for testing and code verification.
-  - docker run $CI_ENV -it -d --name build gcr.io/nordforseti/forseti /bin/bash
+  #- docker run $CI_ENV -it -d --name build gcr.io/nordforseti/forseti /bin/bash
 
 script:
   # Run code coverage.
