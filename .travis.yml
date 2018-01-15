@@ -45,8 +45,8 @@ after_success:
   # Add gcloud to $PATH
   - source /home/travis/google-cloud-sdk/path.bash.inc
   # Auth flow
-  - bash scripts/auth-gcloud.sh
+  - scripts/auth-gcloud.sh
   # Deployment if master branch and !PR
-  - bash scripts/deploy.sh
+  - scripts/deploy.sh
   # Remove gcloud key
   - rm /tmp/gcloud_key.json
