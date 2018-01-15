@@ -4,10 +4,10 @@
   gcloud --quiet components update kubectl
   # Push to Google container registry
   echo "gcloud docker -- push gcr.io/nordforseti/forseti > /dev/null"
-  gcloud docker -- push gcr.io/nordforseti/forseti > /dev/null
+  gcloud docker -- push gcr.io/nordforseti/forseti
   # Deploy to the cluster
   echo "gcloud container clusters get-credentials nordforseti"
-  gcloud container clusters get-credentials nordforseti
+  gcloud container clusters get-credentials test-cluster --zone us-central1-a
   echo "kubectl apply -f scripts/k8s/forseti.yml"
   kubectl apply -f scripts/k8s/forseti.yml
 #fi
