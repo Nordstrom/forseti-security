@@ -22,6 +22,10 @@ python:
 services:
   - docker
 
+cache:
+  directories:
+    - "$HOME/google-cloud-sdk/"
+
 before_install:
   # Build the Forseti base image containing all the dependencies.
   - docker build -t forseti/base -f scripts/docker/base .
@@ -41,7 +45,7 @@ script:
 after_success:
   # Execute codecov inside the docker container. Need to export env for codecov.io upload.
   #- docker exec -it build /bin/sh -c "codecov"
-  - curl https://sdk.cloud.google.com | bash;
+  - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; curl https://sdk.cloud.google.com | bash; fi
   # Add gcloud to $PATH
   - source /home/travis/google-cloud-sdk/path.bash.inc
   # Auth flow

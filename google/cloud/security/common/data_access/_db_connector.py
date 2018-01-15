@@ -41,6 +41,8 @@ class DbConnector(object):
         db_name = os.getenv('CLOUD_SQL_DB_NAME', global_configs['db_name'])
         db_pass = os.getenv('CLOUD_SQL_DB_PASSWORD', global_configs.get('db_password', ''))
 
+        print("host")
+
         try:
             self.conn = MySQLdb.connect(
                 host=host,
