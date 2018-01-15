@@ -1,9 +1,8 @@
 #! /bin/bash
-echo "GCLOUD_KEY > /tmp/gcs_key.json"
-echo $GCLOUD_KEY > /tmp/gcs_key.json
+openssl aes-256-cbc -K $encrypted_cae2a5d5fb7d_key -iv $encrypted_cae2a5d5fb7d_iv -in gcloud-service-key.json.enc -out gcloud-service-key.json -d
 echo "gcloud config set project nordforseti"
 gcloud config set project nordforseti
-echo "gcloud auth activate-service-account --key-file /tmp/gcs_key.json"
-gcloud auth activate-service-account --key-file /tmp/gcs_key.json
+echo "gcloud auth activate-service-account --key-file gcloud-service-key.json"
+gcloud auth activate-service-account --key-file gcloud-service-key.json
 # echo "ssh-keygen -f ~/.ssh/google_compute_engine -N "
 # ssh-keygen -f ~/.ssh/google_compute_engine -N ""
