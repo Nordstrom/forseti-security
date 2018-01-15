@@ -45,10 +45,11 @@ script:
 after_success:
   # Execute codecov inside the docker container. Need to export env for codecov.io upload.
   #- docker exec -it build /bin/sh -c "codecov"
-  - "travis_wait 30 sleep 1800 &"
-  - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; curl https://sdk.cloud.google.com | bash; fi
+  - gcloud version || true
+  - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
   # Add gcloud to $PATH
   - source /home/travis/google-cloud-sdk/path.bash.inc
+  - gcloud version
   # Auth flow
   - scripts/auth-gcloud.sh
   # Deployment if master branch and !PR
