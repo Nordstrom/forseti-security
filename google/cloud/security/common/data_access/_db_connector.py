@@ -14,12 +14,12 @@
 
 """Provides the database connector."""
 
+import os
 import MySQLdb
 from MySQLdb import OperationalError
 
 from google.cloud.security.common.data_access.errors import MySQLError
 from google.cloud.security.common.util import log_util
-
 
 LOGGER = log_util.get_logger(__name__)
 
@@ -35,11 +35,18 @@ class DbConnector(object):
         Raises:
             MySQLError: An error with MySQL has occurred.
         """
+
+        host = os.getenv('CLOUD_SQL_DB_HOST', global_configs['db_host'])
+        user = os.getenv('CLOUD_SQL_DB_USER', global_configs['db_user'])
+        db_name = os.getenv('CLOUD_SQL_DB_NAME', global_configs['db_name'])
+        db_pass = os.getenv('CLOUD_SQL_DB_PASSWORD', global_configs.get('db_password', ''))
+
         try:
             self.conn = MySQLdb.connect(
-                host=global_configs['db_host'],
-                user=global_configs['db_user'],
-                db=global_configs['db_name'],
+                host=host,
+                user=user,
+                db=db_name,
+                passwd=db_pass,
                 local_infile=1)
         except OperationalError as e:
             LOGGER.error('Unable to create mysql connector:\n%s', e)
