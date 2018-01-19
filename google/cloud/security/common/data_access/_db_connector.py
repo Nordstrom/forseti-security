@@ -41,15 +41,16 @@ class DbConnector(object):
         db_name = os.getenv('CLOUD_SQL_DB_NAME', global_configs['db_name'])
         db_pass = os.getenv('CLOUD_SQL_DB_PASSWORD', global_configs.get('db_password', ''))
 
-        print("host")
+        LOGGER.info('db_host', host)
+        LOGGER.info('db_name', db_name)
 
         try:
             self.conn = MySQLdb.connect(
                 host=host,
                 user=user,
                 db=db_name,
-                passwd=db_pass,
-                local_infile=1)
+                port=3306,
+                passwd=db_pass)
         except OperationalError as e:
             LOGGER.error('Unable to create mysql connector:\n%s', e)
             raise MySQLError('DB Connector', e)

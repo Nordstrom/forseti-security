@@ -1,35 +1,21 @@
----
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: forseti
 spec:
-  schedule: "*/3 * * * *"
+  schedule: "0 * * * *"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-            - name: cloudsql-proxy
-              image: gcr.io/cloudsql-docker/gce-proxy:1.11
-              command: ["/cloud_sql_proxy", "--dir=/cloudsql",
-                        "-instances=nordforseti:us-west1:forseti-security-20171122111359=tcp:3306",
-                        "-credential_file=/secrets/cloudsql/credentials.json"]
-              ports:
-                - containerPort: 3306
-              volumeMounts:
-                - name: cloudsql-instance-credentials
-                  mountPath: /secrets/cloudsql
-                  readOnly: true
-                - name: cloudsql
-                  mountPath: /cloudsql
             - name: forseti
               image: gcr.io/nordforseti/forseti:latest
               imagePullPolicy: Always
               args:
-              - /bin/sh
-              - -c
-              - date; echo Hello from the Kubernetes cluster; bash scripts/run_forseti.sh
+                - /bin/sh
+                - -c
+                - date; echo Hello from the Kubernetes cluster; bash scripts/run_forseti.sh
               env:
                 - name: PROJECT
                   value: nordforseti
@@ -38,7 +24,7 @@ spec:
                 - name: BUCKET_NAME
                   value: nordforseti-data-111359
                 - name: CLOUD_SQL_DB_HOST
-                  value: 127.0.0.1:3306
+                  value: 10.8.1.46
                 - name: CLOUD_SQL_DB_USER
                   value: proxy_user
                 - name: CLOUD_SQL_DB_PASSWORD
@@ -51,12 +37,56 @@ spec:
                   mountPath: /key/credentials.json
                   readOnly: true
           volumes:
-            - name: cloudsql-instance-credentials
-              secret:
-                secretName: cloudsql-instance-credentials
-            - name: cloudsql
-              emptyDir:
             - name: forseti-service-account-credentials
               secret:
                 secretName: forseti-service-account-credentials
           restartPolicy: OnFailure
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: forseti-sql
+  labels:
+    app: forseti-sql
+spec:
+  template:
+    metadata:
+      labels:
+        app: forseti-sql
+    spec:
+      containers:
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.11
+          command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                    "-instances=nordforseti:us-west1:forseti-security-20171122111359=tcp:0.0.0.0:3306",
+                    "-credential_file=/secrets/cloudsql/credentials.json"]
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+            - name: cloudsql
+              mountPath: /cloudsql
+      volumes:
+        - name: forseti-service-account-credentials
+          secret:
+            secretName: forseti-service-account-credentials
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+        - name: cloudsql
+          emptyDir:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forseti-sql
+  labels:
+    run: forseti-sql
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+  selector:
+    run: forseti-sql

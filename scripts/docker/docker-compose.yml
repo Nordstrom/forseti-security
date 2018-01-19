@@ -23,12 +23,12 @@
 version: '3'
 services:
   forseti:
-    image: forseti:latest
+    image: gcr.io/nordforseti/forseti
     volumes:
       - ${GCLOUD_CREDS}:/root/.config/
     command: tail -f /dev/null
   cloudsql-proxy:
-    image: gcr.io/cloudsql-docker/gce-proxy:${PROXY_IMG_VERSION}
+    image: gcr.io/cloudsql-docker/gce-proxy
     volumes:
       - /cloudsql:/cloudsql
       - ${FORSETI_KEY}:/config
